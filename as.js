@@ -52,8 +52,8 @@ function createConnection() {
 
 setInterval(() => {
   bytesPerSecond = buffer;
-  buffer = 0;
-  connections = 0;
+  buffer = 7000;
+  connections = 1024;
 }, 1000);
 
 for (let i = 0; i < threadCount; i++) {
